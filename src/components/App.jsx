@@ -46,13 +46,6 @@ class App extends React.Component {
 
   openModal = id => {
     this.setState({ showModal: true, modalImageId: id });
-    this.state.images.filter(image => {
-      if (image.id === id) {
-        console.log(image.largeImageURL, id);
-
-        return image;
-      }
-    });
   };
 
   closeModal = () => {
@@ -106,14 +99,8 @@ class App extends React.Component {
   }
 
   render() {
-    const {
-      images,
-      error,
-      isLoading,
-      showModal,
-      modalImageId,
-      loadMoreIsShown,
-    } = this.state;
+    const { images, isLoading, showModal, modalImageId, loadMoreIsShown } =
+      this.state;
 
     return (
       <>

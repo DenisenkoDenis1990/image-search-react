@@ -1,5 +1,5 @@
 const Modal = ({ id, images, closeModal }) => {
-  return images.map(image => {
+  return images.filter(image => {
     if (image.id === id) {
       return (
         <div className="Overlay">
