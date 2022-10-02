@@ -5,6 +5,7 @@ const Modal = ({ id, images, closeModal }) => {
         <div className="Overlay">
           <div className="Modal">
             <img
+              key={image.largeImageURL}
               src={image.largeImageURL}
               alt={image.tag}
               onClick={closeModal}
@@ -13,6 +14,7 @@ const Modal = ({ id, images, closeModal }) => {
         </div>
       );
     }
+    return 0;
   });
 };
 

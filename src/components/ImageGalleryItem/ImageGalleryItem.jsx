@@ -1,7 +1,7 @@
 const ImageGalleryItem = ({ images, openModal }) => {
   return images.map(({ id, webformatURL, tags }) => {
     return (
-      <li key={id} className="ImageGalleryItem">
+      <li key={webformatURL} className="ImageGalleryItem">
         <img
           src={webformatURL}
           alt={tags}

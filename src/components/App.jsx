@@ -46,13 +46,13 @@ class App extends React.Component {
 
   openModal = id => {
     this.setState({ showModal: true, modalImageId: id });
-    this.state.images.map(image => {
-      if (image.id === id) {
-        console.log(image.largeImageURL, id);
+    // this.state.images.map(image => {
+    //   if (image.id === id) {
+    //     console.log(image.largeImageURL, id);
 
-        return image;
-      }
-    });
+    //     return image;
+    //   }
+    // });
   };
 
   closeModal = () => {
