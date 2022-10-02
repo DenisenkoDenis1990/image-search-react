@@ -64,6 +64,7 @@ class App extends React.Component {
       prevState.query !== this.state.query ||
       prevState.page !== this.state.page
     ) {
+      console.log(this.state.page, this.state.query);
       this.setState({ isLoading: true });
 
       axios
