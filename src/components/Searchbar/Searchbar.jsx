@@ -3,8 +3,6 @@ import { ImSearch } from 'react-icons/im';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import styles from '../../styles.css';
-
 class Searchbar extends Component {
   state = {
     query: '',
