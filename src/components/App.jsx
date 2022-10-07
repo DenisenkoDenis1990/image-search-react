@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
@@ -9,126 +9,104 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Button from './Button/Button';
 import Modal from './Modal/Modal';
-class App extends React.Component {
-  state = {
-    query: '',
-    images: [],
-    page: 1,
-    error: '',
-    isLoading: false,
-    showModal: false,
-    modalImageId: 0,
-    loadMoreIsShown: false,
+
+const App = () => {
+  const [query, setQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalImageId, setModalImageId] = useState(0);
+  const [loadMoreIsShown, setLoadMoreIsShown] = useState(false);
+
+  const KEY = '29310891-e344a11b8695986423724ef53';
+  const BASE_URL = `https://pixabay.com/api/`;
+
+  const searchHandler = query => {
+    setQuery(query);
+    setImages([]);
+    setPage(1);
+    setLoadMoreIsShown(false);
   };
 
-  KEY = '29310891-e344a11b8695986423724ef53';
-  BASE_URL = `https://pixabay.com/api/`;
-
-  searchHandler = query => {
-    this.setState({ query, images: [], page: 1 });
+  const loadMoreHandler = () => {
+    setPage(page + 1);
   };
 
-  loadMoreHandler = () => {
-    this.setState(prevState => {
-      return {
-        page: (prevState.page += 1),
-      };
-    });
-  };
-
-  componentDidMount() {
+  useEffect(() => {
     window.addEventListener('keydown', e => {
       if (e.code === 'Escape') {
-        this.closeModal();
+        closeModal();
       }
     });
-  }
+  }, []);
 
-  openModal = id => {
-    this.setState({ showModal: true, modalImageId: id });
-    // this.state.images.map(image => {
-    //   if (image.id === id) {
-    //     console.log(image.largeImageURL, id);
-
-    //     return image;
-    //   }
-    // });
+  const openModal = id => {
+    setShowModal(true);
+    setModalImageId(id);
   };
 
-  closeModal = () => {
-    this.setState({ showModal: false });
+  const closeModal = () => {
+    setShowModal(false);
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.query !== this.state.query ||
-      prevState.page !== this.state.page
-    ) {
-      console.log(this.state.page, this.state.query);
-      this.setState({ isLoading: true });
-
-      axios
-        .get(this.BASE_URL, {
-          params: {
-            key: this.KEY,
-            page: this.state.page,
-            q: this.state.query,
-            orientation: 'horizontal',
-            per_page: 12,
-            image_type: 'photo',
-          },
-        })
-        .then(response => {
-          if (response.status === 200) {
-            if (this.state.page === 1) {
-              this.setState({
-                images: [...response.data.hits],
-                isLoading: false,
-              });
-            } else {
-              this.setState({
-                images: [...prevState.images, ...response.data.hits],
-                isLoading: false,
-              });
-            }
-            console.log(this.state.images.length);
-            this.state.images.length + 12 < response.data.totalHits
-              ? this.setState({ loadMoreIsShown: true })
-              : this.setState({ loadMoreIsShown: false });
-          }
-          if (response.data.totalHits === 0) {
-            toast.error('There is no images for your request');
-          }
-        })
-        .catch(error => {
-          this.setState({ error: error.message });
-        });
+  useEffect(() => {
+    if (query === '') {
+      return;
     }
-  }
+    console.log(page, query);
+    setIsLoading(true);
 
-  render() {
-    const { images, isLoading, showModal, modalImageId, loadMoreIsShown } =
-      this.state;
+    axios
+      .get(BASE_URL, {
+        params: {
+          key: KEY,
+          page: page,
+          q: query,
+          orientation: 'horizontal',
+          per_page: 12,
+          image_type: 'photo',
+        },
+      })
+      .then(response => {
+        if (response.status === 200) {
+          if (page === 1) {
+            setImages([...response.data.hits]);
+            setIsLoading(false);
+          } else {
+            setImages([...images, ...response.data.hits]);
+            setIsLoading(false);
+          }
+          console.log(images.length);
+          images.length + 12 < response.data.totalHits
+            ? setLoadMoreIsShown(true)
+            : setLoadMoreIsShown(false);
+        }
+        if (response.data.totalHits === 0) {
+          toast.error('There is no images for your request');
+        }
+      })
+      .catch(error => {
+        setError(error.message);
+      });
+  }, [query, page]);
 
-    return (
-      <>
-        <Searchbar onSubmit={this.searchHandler} />
-        <ImageGallery>
-          <ImageGalleryItem images={images} openModal={this.openModal} />
-        </ImageGallery>
-        {isLoading && <Loader />}
-        {loadMoreIsShown && <Button onLoadMore={this.loadMoreHandler} />}
-        {showModal && (
-          <Modal
-            images={images}
-            closeModal={this.closeModal}
-            id={modalImageId}
-          />
-        )}
-        <ToastContainer autoClose={2000} />
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <Searchbar onSubmit={searchHandler} />
+      <ImageGallery>
+        <ImageGalleryItem images={images} openModal={openModal} />
+      </ImageGallery>
+      {isLoading && <Loader />}
+      {loadMoreIsShown && <Button onLoadMore={loadMoreHandler} />}
+      {showModal && (
+        <Modal images={images} closeModal={closeModal} id={modalImageId} />
+      )}
+      {error && <div>{error}</div>}
+      <ToastContainer autoClose={2000} />
+    </>
+  );
+};
 
 export default App;
