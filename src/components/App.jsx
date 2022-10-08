@@ -20,9 +20,6 @@ const App = () => {
   const [modalImageId, setModalImageId] = useState(0);
   const [loadMoreIsShown, setLoadMoreIsShown] = useState(false);
 
-  const KEY = '29310891-e344a11b8695986423724ef53';
-  const BASE_URL = `https://pixabay.com/api/`;
-
   const searchHandler = query => {
     setQuery(query);
     setImages([]);
@@ -52,6 +49,8 @@ const App = () => {
   };
 
   useEffect(() => {
+    const KEY = '29310891-e344a11b8695986423724ef53';
+    const BASE_URL = `https://pixabay.com/api/`;
     if (query === '') {
       return;
     }
@@ -75,7 +74,7 @@ const App = () => {
             setImages([...response.data.hits]);
             setIsLoading(false);
           } else {
-            setImages([...images, ...response.data.hits]);
+            setImages(images => [...images, ...response.data.hits]);
             setIsLoading(false);
           }
           console.log(images.length);
@@ -90,6 +89,7 @@ const App = () => {
       .catch(error => {
         setError(error.message);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, page]);
 
   return (
